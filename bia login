@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>營養門診 BIA & 飲食智能收案系統</title>
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-active: #c2410c;
+      --page-bg: #fff7ed;
+      --card-bg: #ffffff;
+      --card-border: #fed7aa;
+      --text-main: #431407;
+      --text-sub: #9a3412;
+      --text-muted: #7c2d12;
+      --success-bg: #fefce8;
+      --success-border: #fef08a;
+      --success-text: #854d0e;
+      --privacy-green: #059669;
+      --error-bg: #fef2f2;
+      --error-border: #fecaca;
+      --error-text: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: 0 16px 32px -8px rgba(234, 88, 12, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+      border: 1.5px solid var(--card-border);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: #ffedd5;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      box-shadow: inset 0 2px 4px rgba(249, 115, 22, 0.15);
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      margin: 0 0 6px 0;
+      color: #9a3412;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-sub);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #fdba74;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: #ffffff;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    }
+
+    .upload-card {
+      background: #fffaf5;
+      border: 1.5px solid #fed7aa;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .upload-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .upload-card-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #9a3412;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .upload-zone {
+      border: 2px dashed #fb923c;
+      border-radius: 14px;
+      padding: 18px 12px;
+      text-align: center;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-zone:hover {
+      background: #fff7ed;
+      border-color: var(--primary-hover);
+    }
+
+    .upload-zone svg {
+      width: 38px;
+      height: 38px;
+      fill: #f97316;
+      margin-bottom: 4px;
+    }
+
+    .upload-zone p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: #9a3412;
+      font-weight: 700;
+    }
+
+    .upload-zone span {
+      display: block;
+      font-size: 0.75rem;
+      color: #c2410c;
+      margin-top: 3px;
+    }
+
+    .preview-box {
+      display: none;
+      border: 1.5px solid #fdba74;
+      border-radius: 12px;
+      padding: 10px;
+      background: #ffffff;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .preview-box img {
+      max-width: 100%;
+      max-height: 180px;
+      border-radius: 8px;
+      border: 1px solid #fed7aa;
+      object-fit: contain;
+    }
+
+    .btn-clear-photo {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    details {
+      background: #fff7ed;
+      border: 1.5px solid #fed7aa;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+
+    details summary {
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #9a3412;
+      user-select: none;
+    }
+
+    .details-content {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button.btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    button.btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(234, 88, 12, 0.45);
+    }
+
+    button.btn-submit:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-card {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .status-card.success {
+      background: var(--success-bg);
+      border: 1.5px solid var(--success-border);
+      color: var(--success-text);
+      display: block;
+    }
+
+    .status-card.error {
+      background: var(--error-bg);
+      border: 1.5px solid var(--error-border);
+      color: var(--error-text);
+      display: block;
+    }
+
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--privacy-green);
+      margin-top: 4px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-badge">✨</div>
+    <h1>營養門診 BIA & 飲食智能收案</h1>
+    <p>體成分 ＋ 飲食攝取雙區辨識 ‧ 寫入後照片全自動銷毀</p>
+  </header>
+
+  <!-- 1. 組別與看診次數 -->
+  <div class="form-group grid-2">
+    <div>
+      <label for="groupType">收案組別</label>
+      <select id="groupType" onchange="toggleMedField()">
+        <option value="control">🥗 飲食控制組</option>
+        <option value="medication">💊 飲食+藥物組</option>
+      </select>
+    </div>
+    <div>
+      <label for="visitIndex">門診次數</label>
+      <select id="visitIndex">
+        <option value="1">🌱 初診 (收案建檔)</option>
+        <option value="2">🚩 第 1 次追蹤 (2BW)</option>
+        <option value="3">🚩 第 2 次追蹤 (3BW)</option>
+        <option value="4">🚩 第 3 次追蹤 (4BW)</option>
+        <option value="5">🚩 第 4 次追蹤 (5BW)</option>
+        <option value="6">🚩 第 5 次追蹤 (6BW)</option>
+        <option value="7">🚩 第 6 次追蹤 (7BW)</option>
+        <option value="8">🚩 第 7 次追蹤 (8BW)</option>
+        <option value="9">🚩 第 8 次追蹤 (9BW)</option>
+        <option value="10">🚩 第 9 次追蹤 (10BW)</option>
+        <option value="11">🚩 第 10 次追蹤 (11BW)</option>
+        <option value="12">🚩 第 11 次追蹤 (12BW)</option>
+        <option value="13">🚩 第 12 次追蹤 (13BW)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 藥物名稱 -->
+  <div class="form-group" id="medGroup" style="display: none;">
+    <label for="drugName">使用藥物名稱 / 劑量</label>
+    <input type="text" id="drugName" placeholder="例如：Semaglutide 0.5mg / Wegovy">
+  </div>
+
+  <!-- 病歷號 -->
+  <div class="form-group">
+    <label for="chartNoOverride">病歷號 (優先自動從報告紙讀取，亦可在此手動輸入)</label>
+    <input type="text" id="chartNoOverride" placeholder="例如：87654321">
+  </div>
+
+  <!-- 2. 上傳區 1：BIA 報告紙 -->
+  <div class="upload-card">
+    <div class="upload-card-header">
+      <div class="upload-card-title">📊 1. BIA 體成分報告紙 (必選)</div>
+    </div>
+    <div class="upload-zone" id="biaDropZone" onclick="document.getElementById('biaInput').click()">
+      <svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3Z"/></svg>
+      <p id="biaZoneText">📸 點擊拍攝或上傳 InBody / BIA 報告紙</p>
+      <span>自動帶入體重、體脂率、骨骼肌、內臟脂肪、腰臀比、BMR</span>
+      <input type="file" id="biaInput" accept="image/*" capture="environment" style="display:none;" onchange="handleBiaFile(event)">
+    </div>
+    <div class="preview-box" id="biaPreviewBox">
+      <div style="font-size:0.8rem; font-weight:700; color:#c2410c; margin-bottom:4px;">✓ 報告紙預覽確認中</div>
+      <img id="biaPreviewImg" alt="BIA預覽">
+      <div>
+        <button type="button" class="btn-clear-photo" onclick="clearBiaPhoto()">✕ 清除重選</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 上傳區 2：飲食攝取單張 -->
+  <div class="upload-card">
+    <div class="upload-card-header">
+      <div class="upload-card-title">🥗 2. 飲食攝取 (平時與建議三大營養素)</div>
+    </div>
+    <div class="upload-zone" id="dietDropZone" onclick="document.getElementById('dietInput').click()">
+      <svg viewBox="0 0 24 24"><path d="M8.1 13.34l2.83-2.83L3.91 3.5a4.008 4.008 0 0 0 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>
+      <p id="dietZoneText">📸 點擊拍攝或上傳 飲食紀錄 / 衛教單張</p>
+      <span>自動辨識：平時熱量、蛋白質/脂肪/醣類% 及 建議攝取量</span>
+      <input type="file" id="dietInput" accept="image/*" capture="environment" style="display:none;" onchange="handleDietFile(event)">
+    </div>
+    <div class="preview-box" id="dietPreviewBox">
+      <div style="font-size:0.8rem; font-weight:700; color:#c2410c; margin-bottom:4px;">✓ 飲食記錄單預覽確認中</div>
+      <img id="dietPreviewImg" alt="飲食單預覽">
+      <div>
+        <button type="button" class="btn-clear-photo" onclick="clearDietPhoto()">✕ 清除重選</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 手動微調/補充區 -->
+  <details>
+    <summary>🌱 手動補充運動頻率或手動校驗 (選填展開)</summary>
+    <div class="details-content">
+      <div>
+        <label>運動頻率</label>
+        <input type="text" id="manualExercise" placeholder="若單張未記載可在此補充，例：超慢跑 30 分鐘，每週 3 次">
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>平時攝取熱量 (kcal)</label>
+          <input type="number" id="manualCurCal" placeholder="辨識後亦可在此手動微調">
+        </div>
+        <div>
+          <label>建議目標熱量 (kcal)</label>
+          <input type="number" id="manualSugCal" placeholder="辨識後亦可在此手動微調">
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- 5. 送出大按鈕 -->
+  <button type="button" id="submitBtn" class="btn-submit" onclick="submitDualData()">🚀 一鍵智能雙辨識並寫入試算表</button>
+
+  <!-- 6. 結果與隱私回饋卡 -->
+  <div id="statusCard" class="status-card"></div>
+</div>
+
+<script>
+  // 您的 Apps Script 部署 URL
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLP-CMXoI11jbPtFpcSs_LrOR5Y18C9qDddkHqiXURBCjvihopeg7syXWi8ZQKFPyVOw/exec';
+
+  let biaBase64 = '';
+  let biaMime = 'image/jpeg';
+  let dietBase64 = '';
+  let dietMime = 'image/jpeg';
+
+  function toggleMedField() {
+    const isMed = document.getElementById('groupType').value === 'medication';
+    document.getElementById('medGroup').style.display = isMed ? 'block' : 'none';
+  }
+
+  function handleBiaFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    biaMime = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      biaBase64 = e.target.result.split(',')[1];
+      document.getElementById('biaPreviewImg').src = e.target.result;
+      document.getElementById('biaPreviewBox').style.display = 'block';
+      document.getElementById('biaDropZone').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearBiaPhoto() {
+    biaBase64 = '';
+    document.getElementById('biaInput').value = '';
+    document.getElementById('biaPreviewImg').src = '';
+    document.getElementById('biaPreviewBox').style.display = 'none';
+    document.getElementById('biaDropZone').style.display = 'block';
+  }
+
+  function handleDietFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    dietMime = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      dietBase64 = e.target.result.split(',')[1];
+      document.getElementById('dietPreviewImg').src = e.target.result;
+      document.getElementById('dietPreviewBox').style.display = 'block';
+      document.getElementById('dietDropZone').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearDietPhoto() {
+    dietBase64 = '';
+    document.getElementById('dietInput').value = '';
+    document.getElementById('dietPreviewImg').src = '';
+    document.getElementById('dietPreviewBox').style.display = 'none';
+    document.getElementById('dietDropZone').style.display = 'block';
+  }
+
+  function clearAllPhotos() {
+    clearBiaPhoto();
+    clearDietPhoto();
+  }
+
+  // 透過標準 fetch 發送 POST 給 Apps Script 後端
+  async function submitDualData() {
+    if (!biaBase64) {
+      alert('請至少拍攝或上傳一張「BIA 體成分報告紙」！');
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    const statusCard = document.getElementById('statusCard');
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = '⚡ AI 正在精準雙辨識 (體成分＋飲食攝取)，請稍候...';
+    statusCard.className = 'status-card';
+    statusCard.style.display = 'none';
+
+    const payload = {
+      biaBase64: biaBase64,
+      biaMime: biaMime,
+      dietBase64: dietBase64,
+      dietMime: dietMime,
+      groupType: document.getElementById('groupType').value,
+      visitIndex: document.getElementById('visitIndex').value,
+      drugName: document.getElementById('drugName').value,
+      chartNoOverride: document.getElementById('chartNoOverride').value,
+      manualExercise: document.getElementById('manualExercise').value,
+      manualCurCal: document.getElementById('manualCurCal').value,
+      manualSugCal: document.getElementById('manualSugCal').value
+    };
+
+    try {
+      // 避免跨網域預檢限制，使用 text/plain 發送 JSON 字串
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const res = await response.json();
+
+      submitBtn.disabled = false;
+      submitBtn.innerText = '🚀 一鍵智能雙辨識並寫入試算表';
+
+      if (res.success) {
+        statusCard.className = 'status-card success';
+        const bia = res.extractedBia;
+        const diet = res.extractedDiet;
+
+        statusCard.innerHTML = `
+          <strong>🎉 ${res.message}</strong><br>
+          <div class="privacy-badge">🔒 雙重隱私防護：兩份影像與記憶體暫存已全數銷毀！</div>
+          <hr style="border:none; border-top:1px dashed #fef08a; margin:8px 0;">
+          • 個案姓名：<strong>${bia.patient_name || '未填'}</strong> (病歷號: ${bia.chart_no || '無'})<br>
+          • 【體成分】體重 <strong>${bia.weight}</strong> kg ｜ 體脂率 <strong>${bia.body_fat_percent}</strong>% ｜ 骨骼肌 <strong>${bia.muscle_mass}</strong> kg<br>
+          • 【平時攝取】熱量 <strong>${diet.current_calorie || '-'}</strong> kcal ｜ P: <strong>${diet.current_protein || '-'}</strong>% ｜ F: <strong>${diet.current_fat || '-'}</strong>% ｜ C: <strong>${diet.current_carb || '-'}</strong>%<br>
+          • 【建議目標】熱量 <strong>${diet.suggest_calorie || '-'}</strong> kcal ｜ P: <strong>${diet.suggest_protein || '-'}</strong>% ｜ F: <strong>${diet.suggest_fat || '-'}</strong>% ｜ C: <strong>${diet.suggest_carb || '-'}</strong>%<br>
+          • 【運動頻率】${diet.exercise || '未記載'}
+        `;
+
+        clearAllPhotos();
+
+      } else {
+        statusCard.className = 'status-card error';
+        statusCard.innerHTML = `<strong>⚠️ 寫入失敗：</strong> ${res.error}`;
+      }
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = '🚀 一鍵智能雙辨識並寫入試算表';
+      statusCard.className = 'status-card error';
+      statusCard.innerHTML = `<strong>⚠️ 網路連線或系統異常：</strong> ${err.message || err}`;
+    }
+  }
+</script>
+
+</body>
+</html>
